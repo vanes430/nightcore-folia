@@ -11,3 +11,4 @@
 /main/pom.xml.versionsBackup
 /bridge/pom.xml.versionsBackup
 dependency-reduced-pom.xml
+/bridge/target/
