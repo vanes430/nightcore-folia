@@ -1,4 +1,5 @@
 name: nightcore
+folia-supported: true
 main: su.nightexpress.nightcore.NightCore
 version: '${project.version}'
 description: Plugin core

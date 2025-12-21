@@ -2,6 +2,7 @@ main: su.nightexpress.nightcore.NightCore
 bootstrapper: su.nightexpress.nightcore.NightCoreBootstrap
 loader: su.nightexpress.nightcore.NightCoreLoader
 name: nightcore
+folia-supported: true
 version: '${project.version}'
 description: Plugin engine
 load: STARTUP
