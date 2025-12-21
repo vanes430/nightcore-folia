@@ -1,5 +1,6 @@
 package su.nightexpress.nightcore.util.wrapper;
 
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.jetbrains.annotations.NotNull;
 import su.nightexpress.nightcore.NightCorePlugin;
 
@@ -9,9 +10,9 @@ public class UniTask {
     private final NightCorePlugin plugin;
     private final Runnable        runnable;
 
-    private long    interval;
-    private boolean async;
-    private int     taskId;
+    private long        interval;
+    private boolean     async;
+    private WrappedTask task;
 
     public UniTask(@NotNull NightCorePlugin plugin, @NotNull Runnable runnable) {
         this(plugin, runnable, 0L);
@@ -34,8 +35,6 @@ public class UniTask {
         this.runnable = runnable;
         this.interval = interval;
         this.async = async;
-
-        this.taskId = -1;
     }
 
     @Deprecated
@@ -61,7 +60,7 @@ public class UniTask {
     }
 
     public boolean isRunning() {
-        return this.taskId >= 0 && this.plugin.getScheduler().isCurrentlyRunning(this.taskId);
+        return this.task != null;
     }
 
     public final void restart() {
@@ -70,22 +69,22 @@ public class UniTask {
     }
 
     public UniTask start() {
-        if (this.taskId >= 0 || this.interval <= 0L) return this;
+        if (this.task != null || this.interval <= 0L) return this;
 
         if (this.async) {
-            this.taskId = plugin.getScheduler().runTaskTimerAsynchronously(plugin, runnable, 0L, interval).getTaskId();
+            this.task = plugin.getFoliaLib().getScheduler().runTimerAsync(runnable, 0L, interval);
         }
         else {
-            this.taskId = plugin.getScheduler().runTaskTimer(plugin, runnable, 0L, interval).getTaskId();
+            this.task = plugin.getFoliaLib().getScheduler().runTimer(runnable, 0L, interval);
         }
         return this;
     }
 
     public boolean stop() {
-        if (this.taskId < 0) return false;
+        if (this.task == null) return false;
 
-        this.plugin.getServer().getScheduler().cancelTask(this.taskId);
-        this.taskId = -1;
+        this.task.cancel();
+        this.task = null;
         return true;
     }
 }

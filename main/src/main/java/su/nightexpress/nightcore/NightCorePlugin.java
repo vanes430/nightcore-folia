@@ -1,5 +1,7 @@
 package su.nightexpress.nightcore;
 
+import com.tcoded.folialib.FoliaLib;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -83,6 +85,9 @@ public interface NightCorePlugin extends Plugin {
     @NotNull CommandManager getCommandManager();
 
     @NotNull
+    FoliaLib getFoliaLib();
+
+    @NotNull
     default BukkitScheduler getScheduler() {
         return this.getServer().getScheduler();
     }
@@ -94,28 +99,28 @@ public interface NightCorePlugin extends Plugin {
 
     void runTask(@NotNull Runnable runnable);
 
-    default void runTask(@NotNull Consumer<BukkitTask> consumer) {
-        this.getScheduler().runTask(this, consumer);
+    default void runTask(@NotNull Consumer<WrappedTask> consumer) {
+        this.getFoliaLib().getScheduler().runNextTick(consumer);
     }
 
-    default void runTaskAsync(@NotNull Consumer<BukkitTask> consumer) {
-        this.getScheduler().runTaskAsynchronously(this, consumer);
+    default void runTaskAsync(@NotNull Consumer<WrappedTask> consumer) {
+        this.getFoliaLib().getScheduler().runAsync(consumer);
     }
 
-    default void runTaskLater(@NotNull Consumer<BukkitTask> consumer, long delay) {
-        this.getScheduler().runTaskLater(this, consumer, delay);
+    default void runTaskLater(@NotNull Consumer<WrappedTask> consumer, long delay) {
+        this.getFoliaLib().getScheduler().runLater(consumer, delay);
     }
 
-    default void runTaskLaterAsync(@NotNull Consumer<BukkitTask> consumer, long delay) {
-        this.getScheduler().runTaskLaterAsynchronously(this, consumer, delay);
+    default void runTaskLaterAsync(@NotNull Consumer<WrappedTask> consumer, long delay) {
+        this.getFoliaLib().getScheduler().runLaterAsync(consumer, delay);
     }
 
-    default void runTaskTimer(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
-        this.getScheduler().runTaskTimer(this, consumer, delay, interval);
+    default void runTaskTimer(@NotNull Consumer<WrappedTask> consumer, long delay, long interval) {
+        this.getFoliaLib().getScheduler().runTimer(consumer, delay, interval);
     }
 
-    default void runTaskTimerAsync(@NotNull Consumer<BukkitTask> consumer, long delay, long interval) {
-        this.getScheduler().runTaskTimerAsynchronously(this, consumer, delay, interval);
+    default void runTaskTimerAsync(@NotNull Consumer<WrappedTask> consumer, long delay, long interval) {
+        this.getFoliaLib().getScheduler().runTimerAsync(consumer, delay, interval);
     }
 
     @NotNull

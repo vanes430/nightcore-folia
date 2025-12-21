@@ -1,5 +1,6 @@
 package su.nightexpress.nightcore;
 
+import com.tcoded.folialib.FoliaLib;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,6 +30,7 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
     public static final String CONFIG_FILE = "config.yml";
     public static final String ENGINE_FILE = "engine.yml";
 
+    protected FoliaLib       foliaLib;
     protected NightCommand   rootCommand;
     protected List<Runnable> postLoaders;
 
@@ -42,6 +44,7 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
 
     @Override
     public void onEnable() {
+        this.foliaLib = new FoliaLib(this);
         if (!Engine.handleEnable(this)) {
             return;
         }
@@ -190,7 +193,7 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
     }
 
     protected void unloadManagers() {
-        this.getScheduler().cancelTasks(this);  // Stop all plugin tasks.
+        this.foliaLib.getScheduler().cancelAllTasks(); // Stop all plugin tasks.
 
         this.disable();
 
@@ -265,6 +268,12 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
     }
 
     @Override
+    @NotNull
+    public FoliaLib getFoliaLib() {
+        return this.foliaLib;
+    }
+
+    @Override
     public void extractResources(@NotNull String jarPath) {
         this.extractResources(jarPath, this.getDataFolder() + jarPath);
     }
@@ -286,6 +295,6 @@ public abstract class NightPlugin extends JavaPlugin implements NightCorePlugin 
 
     @Override
     public void runTask(@NotNull Runnable runnable) {
-        this.getScheduler().runTask(this, runnable);
+        this.getFoliaLib().getScheduler().runNextTick(task -> runnable.run());
     }
 }
