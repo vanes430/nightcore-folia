@@ -10,4 +10,4 @@
 /main/target/
 /main/pom.xml.versionsBackup
 /bridge/pom.xml.versionsBackup
-/bridge/target/
+dependency-reduced-pom.xml
