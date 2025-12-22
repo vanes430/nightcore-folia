@@ -416,22 +416,26 @@ public class Players {
         }
     }
 
-    public static void addItem(@NotNull Player player, @NotNull ItemStack... items) {
-        addItem(player.getInventory(), player.getLocation(), items);
+    public static boolean addItem(@NotNull Player player, @NotNull ItemStack... items) {
+        return addItem(player.getInventory(), player.getLocation(), items);
     }
 
-    public static void addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack... items) {
+    public static boolean addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack... items) {
+        boolean added = false;
         for (ItemStack item : items) {
-            addItem(inventory, location, item, item.getAmount());
+            if (addItem(inventory, location, item, item.getAmount())) {
+                added = true;
+            }
         }
+        return added;
     }
 
-    public static void addItem(@NotNull Player player, @NotNull ItemStack itemStack, int amount) {
-        addItem(player.getInventory(), player.getLocation(), itemStack, amount);
+    public static boolean addItem(@NotNull Player player, @NotNull ItemStack itemStack, int amount) {
+        return addItem(player.getInventory(), player.getLocation(), itemStack, amount);
     }
 
-    public static void addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack itemStack, int amount) {
-        if (amount <= 0 || itemStack.getType().isAir()) return;
+    public static boolean addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack itemStack, int amount) {
+        if (amount <= 0 || itemStack.getType().isAir()) return false;
 
         ItemStack split = new ItemStack(itemStack);
 
@@ -445,5 +449,7 @@ public class Players {
 
         amount -= realAmount;
         if (amount > 0) addItem(inventory, location, itemStack, amount);
+
+        return true;
     }
 }
