@@ -93,11 +93,29 @@ public class EntityUtil {
     @Nullable
     public static ItemStack getItemInSlot(@NotNull LivingEntity entity, @NotNull EquipmentSlot slot) {
         if (entity instanceof Player player) {
-            return player.getInventory().getItem(slot);
+            return switch (slot) {
+                case HAND -> player.getInventory().getItemInMainHand();
+                case OFF_HAND -> player.getInventory().getItemInOffHand();
+                case HEAD -> player.getInventory().getHelmet();
+                case CHEST -> player.getInventory().getChestplate();
+                case LEGS -> player.getInventory().getLeggings();
+                case FEET -> player.getInventory().getBoots();
+                default -> player.getInventory().getItem(slot);
+            };
         }
 
         EntityEquipment equipment = entity.getEquipment();
-        return equipment == null ? null : equipment.getItem(slot);
+        if (equipment == null) return null;
+
+        return switch (slot) {
+            case HAND -> equipment.getItemInMainHand();
+            case OFF_HAND -> equipment.getItemInOffHand();
+            case HEAD -> equipment.getHelmet();
+            case CHEST -> equipment.getChestplate();
+            case LEGS -> equipment.getLeggings();
+            case FEET -> equipment.getBoots();
+            default -> equipment.getItem(slot);
+        };
     }
 
     @NotNull
