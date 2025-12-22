@@ -32,6 +32,13 @@ public class ButtonLocale extends LangEntry<ButtonLocale.Value> {
         return new ButtonLocale(path, new Value(label, tooltip, width));
     }
 
+    @NotNull
+    public ButtonLocale replace(@NotNull java.util.function.UnaryOperator<String> operator) {
+        String label = operator.apply(this.value().label());
+        String tooltip = this.value().tooltip() == null ? null : operator.apply(this.value().tooltip());
+        return new ButtonLocale(this.path, new Value(label, tooltip, this.value().width()));
+    }
+
     public record Value(@NotNull String label, @Nullable String tooltip, int width) implements LangValue {
 
         @NotNull
