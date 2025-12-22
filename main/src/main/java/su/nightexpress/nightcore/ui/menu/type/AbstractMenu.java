@@ -316,7 +316,7 @@ public abstract class AbstractMenu<P extends NightPlugin> implements Menu {
         DialogManager.startDialog(dialog);
         Player player = dialog.getPlayer();
 
-        this.runNextTick(player::closeInventory);
+        this.plugin.getFoliaLib().getScheduler().runAtEntity(player, task -> player.closeInventory());
     }
 
     @Override

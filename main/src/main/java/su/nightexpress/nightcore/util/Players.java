@@ -1,6 +1,7 @@
 package su.nightexpress.nightcore.util;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -301,56 +302,98 @@ public class Players {
     }
 
     public static int countItemSpace(@NotNull Player player, @NotNull ItemStack item) {
-        int stackSize = item.getType().getMaxStackSize();
-        return Stream.of(player.getInventory().getStorageContents()).mapToInt(itemHas -> {
+        return countItemSpace(player.getInventory(), item::isSimilar, item.getType().getMaxStackSize());
+    }
+
+    public static int countItemSpace(@NotNull Inventory inventory, @NotNull ItemStack item) {
+        return countItemSpace(inventory, item::isSimilar, item.getType().getMaxStackSize());
+    }
+
+    public static int countItemSpace(@NotNull Inventory inventory, @NotNull Predicate<ItemStack> predicate, int maxSize) {
+        return Stream.of(inventory.getStorageContents()).mapToInt(itemHas -> {
             if (itemHas == null || itemHas.getType().isAir()) {
-                return stackSize;
+                return maxSize;
             }
-            if (itemHas.isSimilar(item)) {
-                return (stackSize - itemHas.getAmount());
+            if (predicate.test(itemHas)) {
+                return (maxSize - itemHas.getAmount());
             }
             return 0;
         }).sum();
     }
 
     public static int countItem(@NotNull Player player, @NotNull Predicate<ItemStack> predicate) {
-        return Stream.of(player.getInventory().getContents())
-            .filter(item -> item != null && predicate.test(item))
+        return countItem(player.getInventory(), predicate);
+    }
+
+    public static int countItem(@NotNull Inventory inventory, @NotNull Predicate<ItemStack> predicate) {
+        return Stream.of(inventory.getContents())
+            .filter(item -> item != null && !item.getType().isAir() && predicate.test(item))
             .mapToInt(ItemStack::getAmount).sum();
     }
 
     public static int countItem(@NotNull Player player, @NotNull ItemStack item) {
-        return countItem(player, item::isSimilar);
+        return countItem(player.getInventory(), item::isSimilar);
+    }
+
+    public static int countItem(@NotNull Inventory inventory, @NotNull ItemStack item) {
+        return countItem(inventory, item::isSimilar);
     }
 
     public static int countItem(@NotNull Player player, @NotNull Material material) {
-        return countItem(player, itemHas -> itemHas.getType() == material);
+        return countItem(player.getInventory(), itemHas -> itemHas.getType() == material);
+    }
+
+    public static int countItem(@NotNull Inventory inventory, @NotNull Material material) {
+        return countItem(inventory, itemHas -> itemHas.getType() == material);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull ItemStack item) {
-        takeItem(player, item, -1);
+        takeItem(player.getInventory(), item, -1);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull ItemStack item) {
+        takeItem(inventory, item, -1);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull ItemStack item, int amount) {
+        takeItem(inventory, itemHas -> itemHas.isSimilar(item), amount);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull ItemStack item, int amount) {
-        takeItem(player, itemHas -> itemHas.isSimilar(item), amount);
+        takeItem(player.getInventory(), item, amount);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull Material material) {
-        takeItem(player, material, -1);
+        takeItem(player.getInventory(), itemHas -> itemHas.getType() == material, -1);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull Material material) {
+        takeItem(inventory, itemHas -> itemHas.getType() == material, -1);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull Material material, int amount) {
+        takeItem(inventory, itemHas -> itemHas.getType() == material, amount);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull Material material, int amount) {
-        takeItem(player, itemHas -> itemHas.getType() == material, amount);
+        takeItem(player.getInventory(), material, amount);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull Predicate<ItemStack> predicate) {
-        takeItem(player, predicate, -1);
+        takeItem(player.getInventory(), predicate, -1);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull Predicate<ItemStack> predicate) {
+        takeItem(inventory, predicate, -1);
     }
 
     public static void takeItem(@NotNull Player player, @NotNull Predicate<ItemStack> predicate, int amount) {
+        takeItem(player.getInventory(), predicate, amount);
+    }
+
+    public static void takeItem(@NotNull Inventory inventory, @NotNull Predicate<ItemStack> predicate, int amount) {
         int takenAmount = 0;
 
-        Inventory inventory = player.getInventory();
         for (ItemStack itemHas : inventory.getContents()) {
             if (itemHas == null || !predicate.test(itemHas)) continue;
 
@@ -374,24 +417,33 @@ public class Players {
     }
 
     public static void addItem(@NotNull Player player, @NotNull ItemStack... items) {
+        addItem(player.getInventory(), player.getLocation(), items);
+    }
+
+    public static void addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack... items) {
         for (ItemStack item : items) {
-            addItem(player, item, item.getAmount());
+            addItem(inventory, location, item, item.getAmount());
         }
     }
 
     public static void addItem(@NotNull Player player, @NotNull ItemStack itemStack, int amount) {
+        addItem(player.getInventory(), player.getLocation(), itemStack, amount);
+    }
+
+    public static void addItem(@NotNull Inventory inventory, @Nullable Location location, @NotNull ItemStack itemStack, int amount) {
         if (amount <= 0 || itemStack.getType().isAir()) return;
 
-        World world = player.getWorld();
         ItemStack split = new ItemStack(itemStack);
 
         int realAmount = Math.min(split.getMaxStackSize(), amount);
         split.setAmount(realAmount);
-        player.getInventory().addItem(split).values().forEach(left -> {
-            world.dropItem(player.getLocation(), left);
+        inventory.addItem(split).values().forEach(left -> {
+            if (location != null && location.getWorld() != null) {
+                location.getWorld().dropItem(location, left);
+            }
         });
 
         amount -= realAmount;
-        if (amount > 0) addItem(player, itemStack, amount);
+        if (amount > 0) addItem(inventory, location, itemStack, amount);
     }
 }
