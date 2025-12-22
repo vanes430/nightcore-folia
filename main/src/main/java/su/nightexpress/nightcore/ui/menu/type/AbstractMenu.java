@@ -97,6 +97,12 @@ public abstract class AbstractMenu<P extends NightPlugin> implements Menu {
 
     @Override
     public void runNextTick(@NotNull Runnable runnable) {
+        Set<MenuViewer> viewers = this.getViewers();
+        if (!viewers.isEmpty()) {
+            MenuViewer first = viewers.iterator().next();
+            this.plugin.getFoliaLib().getScheduler().runAtEntity(first.getPlayer(), task -> runnable.run());
+            return;
+        }
         this.plugin.runTask(task -> runnable.run());
     }
 
