@@ -125,7 +125,7 @@ public class DialogManager {
 
         items.forEach(element -> {
             String hoverHint = GRAY.enclose("Click me to select " + CYAN.enclose(element) + ".");
-            String clickCommand = element.charAt(0) == '/' ? element : '/' + element;
+            String clickCommand = element;
 
             builder.append(DARK_GRAY.enclose("> ")).append(GREEN.enclose(HOVER.wrapShowText(CLICK.wrap(element, action, clickCommand), hoverHint)));
             builder.append(Placeholders.TAG_LINE_BREAK);
