@@ -2,13 +2,14 @@ name: Build and Release
 
 on:
   push:
+    branches: [ "*" ]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-and-release:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,14 +26,12 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -U
 
-      - name: Release to Latest
-        uses: softprops/action-gh-release@v1
+      - name: Update Latest Release
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          name: Latest Release
-          tag_name: latest
-          files: target/*.jar
-          fail_on_unmatched_files: true
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
           prerelease: false
-          draft: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          title: "Latest Development Build"
+          files: target/nightcore-*.jar
