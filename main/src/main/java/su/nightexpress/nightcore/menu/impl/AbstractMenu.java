@@ -165,41 +165,43 @@ public abstract class AbstractMenu<P extends NightCorePlugin> implements Menu {
         MenuOptions options = new MenuOptions(this.getOptions());
         MenuViewer viewer = this.getViewerOrCreate(player);
 
-        this.getItems().removeIf(menuItem -> menuItem.getOptions().canBeDestroyed(viewer));
-        this.onPrepare(viewer, options);
+        this.plugin.getFoliaLib().getScheduler().runAtEntity(player, task -> {
+            this.getItems().removeIf(menuItem -> menuItem.getOptions().canBeDestroyed(viewer));
+            this.onPrepare(viewer, options);
 
-        if (!viewer.hasInventory()) {
-            viewer.openInventory(options.createInventory());
-        }
-        else {
-            viewer.flushInventory(options);
-        }
-
-        Inventory inventory = viewer.getInventory();
-        if (inventory == null) {
-            this.plugin.debug("Could not create " + this.getClass().getSimpleName() + " menu for '" + player.getName() + "'.");
-            this.purgeViewer(player);
-            return false;
-        }
-        if (inventory.getType() == InventoryType.CRAFTING) {
-            this.plugin.warn("Got CRAFTING inventory when trying to open " + this.getClass().getSimpleName() + " menu for '" + player.getName() + "'.");
-            this.purgeViewer(player);
-            return false;
-        }
-
-        this.getItems(viewer).forEach(menuItem -> {
-            ItemStack item = menuItem.getItemStack();
-            menuItem.getOptions().modifyDisplay(viewer, item);
-
-            for (int slot : menuItem.getSlots()) {
-                if (slot < 0 || slot >= inventory.getSize()) continue;
-                inventory.setItem(slot, item);
+            if (!viewer.hasInventory()) {
+                viewer.openInventory(options.createInventory());
             }
+            else {
+                viewer.flushInventory(options);
+            }
+
+            Inventory inventory = viewer.getInventory();
+            if (inventory == null) {
+                this.plugin.debug("Could not create " + this.getClass().getSimpleName() + " menu for '" + player.getName() + "'.");
+                this.purgeViewer(player);
+                return;
+            }
+            if (inventory.getType() == InventoryType.CRAFTING) {
+                this.plugin.warn("Got CRAFTING inventory when trying to open " + this.getClass().getSimpleName() + " menu for '" + player.getName() + "'.");
+                this.purgeViewer(player);
+                return;
+            }
+
+            this.getItems(viewer).forEach(menuItem -> {
+                ItemStack item = menuItem.getItemStack();
+                menuItem.getOptions().modifyDisplay(viewer, item);
+
+                for (int slot : menuItem.getSlots()) {
+                    if (slot < 0 || slot >= inventory.getSize()) continue;
+                    inventory.setItem(slot, item);
+                }
+            });
+
+            this.onReady(viewer, inventory);
+
+            PLAYER_MENUS.put(player.getUniqueId(), this);
         });
-
-        this.onReady(viewer, inventory);
-
-        PLAYER_MENUS.put(player.getUniqueId(), this);
         return true;
     }
 
