@@ -112,7 +112,7 @@ public class Engine {
 
         if (current == Version.UNKNOWN) {
             plugin.warn("WARNING: This plugin is not supposed to run on this server version!");
-            plugin.warn("If server version is newer than " + Version.values()[Version.values().length - 2] + ", then wait for an update please.");
+            plugin.warn("If server version is newer than " + Version.values()[Version.values().length - 2].getLocalized() + ", then wait for an update please.");
             plugin.warn("The plugin may not work properly.");
         }
         else if (current.isDeprecated()) {
