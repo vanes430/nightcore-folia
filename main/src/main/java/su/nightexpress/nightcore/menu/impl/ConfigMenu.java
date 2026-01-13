@@ -105,6 +105,8 @@ public abstract class ConfigMenu<P extends NightCorePlugin> extends AbstractMenu
         }
 
         this.cfg.getSection(this.itemSection).forEach(sId -> {
+            if (!this.cfg.contains(this.itemSection + "." + sId + ".Item")) return;
+
             MenuItem menuItem = this.readItem(this.itemSection + "." + sId);
             this.addItem(menuItem);
 
