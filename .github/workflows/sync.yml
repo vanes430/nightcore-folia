@@ -26,6 +26,8 @@ jobs:
             "vanes430/ExcellentCrates-folia"
             "vanes430/ExcellentEnchants-folia"
             "vanes430/ExcellentShop-folia"
+            "vanes430/CombatPets-folia"
+            "vanes430/ExcellentJobs-folia"
           )
 
           for REPO in "${REPOS[@]}"; do
