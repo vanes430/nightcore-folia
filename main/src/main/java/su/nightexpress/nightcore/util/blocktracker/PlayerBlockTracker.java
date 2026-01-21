@@ -1,6 +1,5 @@
 package su.nightexpress.nightcore.util.blocktracker;
 
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.NamespacedKey;
@@ -12,13 +11,14 @@ import org.jetbrains.annotations.Nullable;
 import su.nightexpress.nightcore.Engine;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public final class PlayerBlockTracker {
 
     public static final  Set<Predicate<Block>>   BLOCK_FILTERS     = new HashSet<>();
     public static final  NamespacedKey           TRACKED_DATA_KEY  = NamespacedKey.minecraft("tracked_chunk_data");
-    private static final Map<UUID, TrackedWorld> TRACKED_WORLD_MAP = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, TrackedWorld> TRACKED_WORLD_MAP = new ConcurrentHashMap<>();
 
     private static TrackListener<?> listener;
 

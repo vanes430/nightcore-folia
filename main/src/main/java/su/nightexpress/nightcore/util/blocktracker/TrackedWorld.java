@@ -1,7 +1,7 @@
 package su.nightexpress.nightcore.util.blocktracker;
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.bukkit.Chunk;
 import org.bukkit.block.Block;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -10,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class TrackedWorld {
 
-    private final Long2ObjectMap<TrackedChunk> chunkMap;
+    private final Map<Long, TrackedChunk> chunkMap;
 
     protected TrackedWorld() {
-        this.chunkMap = new Long2ObjectOpenHashMap<>();
+        this.chunkMap = new ConcurrentHashMap<>();
     }
 
     protected boolean isTracked(@NotNull Block block) {
