@@ -12,11 +12,12 @@ import su.nightexpress.nightcore.Engine;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Predicate;
 
 public final class PlayerBlockTracker {
 
-    public static final  Set<Predicate<Block>>   BLOCK_FILTERS     = new HashSet<>();
+    public static final  Set<Predicate<Block>>   BLOCK_FILTERS     = new CopyOnWriteArraySet<>();
     public static final  NamespacedKey           TRACKED_DATA_KEY  = NamespacedKey.minecraft("tracked_chunk_data");
     private static final Map<UUID, TrackedWorld> TRACKED_WORLD_MAP = new ConcurrentHashMap<>();
 

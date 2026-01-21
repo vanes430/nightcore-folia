@@ -11,11 +11,12 @@ import su.nightexpress.nightcore.util.bridge.Software;
 import su.nightexpress.nightcore.util.placeholder.Replacer;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class Dialogs {
 
-    private static final Map<UUID, WrappedDialog> ACTIVE_DIALOGS = new HashMap<>();
+    private static final Map<UUID, WrappedDialog> ACTIVE_DIALOGS = new ConcurrentHashMap<>();
 
     public static void clearDialogs() {
         new HashSet<>(ACTIVE_DIALOGS.keySet()).stream().map(Players::getPlayer).filter(Objects::nonNull).forEach(Dialogs::exitDialog);

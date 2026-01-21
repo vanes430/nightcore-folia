@@ -13,13 +13,14 @@ import su.nightexpress.nightcore.util.bridge.wrapper.ClickEventType;
 import su.nightexpress.nightcore.util.time.TimeFormats;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static su.nightexpress.nightcore.util.text.tag.Tags.*;
 
 @Deprecated
 public class DialogManager {
 
-    private static final Map<UUID, Dialog> DIALOG_MAP = new HashMap<>();
+    private static final Map<UUID, Dialog> DIALOG_MAP = new ConcurrentHashMap<>();
 
     public static final String EXIT   = "#exit";
     public static final String VALUES = "#values";

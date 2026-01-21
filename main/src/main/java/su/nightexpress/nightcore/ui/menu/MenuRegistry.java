@@ -5,11 +5,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class MenuRegistry {
 
-    private static final Map<UUID, MenuViewer> VIEWER_BY_ID = new HashMap<>();
+    private static final Map<UUID, MenuViewer> VIEWER_BY_ID = new ConcurrentHashMap<>();
 
     public static void closeAll() {
         getViewers().stream().map(MenuViewer::getMenu).distinct().forEach(Menu::clear);
